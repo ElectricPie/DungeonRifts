@@ -6,6 +6,7 @@
 #include "DRiftCharacterBase.h"
 #include "DRiftPartyCharacter.generated.h"
 
+class USpringArmComponent;
 class UCameraComponent;
 
 UCLASS()
@@ -18,5 +19,8 @@ public:
 	ADRiftPartyCharacter();
 
 private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USpringArmComponent> CameraSpringArmComponent;
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComponent;
 };
