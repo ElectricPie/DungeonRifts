@@ -16,6 +16,9 @@ ADRiftPartyCharacter::ADRiftPartyCharacter()
 	CameraSpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraSpringArmComponent"));
 	CameraSpringArmComponent->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
 	CameraSpringArmComponent->TargetArmLength = 700.f;
+	CameraSpringArmComponent->bInheritPitch = false;
+	CameraSpringArmComponent->bInheritRoll = false;
+	CameraSpringArmComponent->bInheritYaw = false;
 	CameraSpringArmComponent->SetupAttachment(RootComponent);
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
