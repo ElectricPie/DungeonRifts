@@ -6,6 +6,8 @@
 #include "GameFramework/GameState.h"
 #include "DRiftGameState.generated.h"
 
+class IPartyInterface;
+
 UCLASS(BlueprintType)
 class UPlayerParty : public UObject
 {
@@ -15,7 +17,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<TObjectPtr<APlayerController>> Players;
 	UPROPERTY(BlueprintReadWrite)
-	TArray<TObjectPtr<ACharacter>> Members;
+	TArray<TScriptInterface<IPartyInterface>> Members;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -41,11 +43,11 @@ public:
 	/**
 	 * Adds a character to the specified party.
 	 * @param PartyId The ID of the party to add the character to.
-	 * @param NewCharacter The character to add to the party.
+	 * @param NewMember The Actor to add to the party, this must implement IPartyInterface.
 	 * @return True if the character was successfully added, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool AddCharacterToParty(int32 PartyId, ACharacter* NewCharacter);
+	bool AddMemberToParty(const int32 PartyId, AActor* NewMember);
 	/**
 	 * Gets the party by its ID.
 	 * @param PartyId The ID of the party to retrieve.
