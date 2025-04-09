@@ -3,7 +3,7 @@
 
 #include "GameStates/DRiftGameState.h"
 
-#include "Party/PartyInterface.h"
+#include "Characters/DRiftPartyCharacter.h"
 
 int32 ADRiftGameState::CreateParty()
 {
@@ -12,13 +12,11 @@ int32 ADRiftGameState::CreateParty()
 	return NextPartyId++;
 }
 
-bool ADRiftGameState::AddMemberToParty(const int32 PartyId, AActor* NewMember)
+bool ADRiftGameState::AddMemberToParty(const int32 PartyId, ADRiftPartyCharacter* NewMember)
 {
 	if (!PlayerParties.Contains(PartyId))
 		return false;
 	if (NewMember == nullptr)
-		return false;
-	if (NewMember->GetClass()->ImplementsInterface(UPartyInterface::StaticClass()) == false)
 		return false;
 	
 	PlayerParties[PartyId]->Members.Add(NewMember);
@@ -28,10 +26,10 @@ bool ADRiftGameState::AddMemberToParty(const int32 PartyId, AActor* NewMember)
 
 UPlayerParty* ADRiftGameState::GetPlayerPartyById(const int32 PartyId)
 {
-	if (!PlayerParties.Contains(PartyId))
+	if (PlayerParties.Contains(PartyId))
 	{
-		return nullptr;
+		return PlayerParties[PartyId];
 	}
 
-	return PlayerParties[PartyId];
+	return nullptr;
 }

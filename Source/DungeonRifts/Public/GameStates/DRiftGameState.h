@@ -6,7 +6,7 @@
 #include "GameFramework/GameState.h"
 #include "DRiftGameState.generated.h"
 
-class IPartyInterface;
+class ADRiftPartyCharacter;
 
 UCLASS(BlueprintType)
 class UPlayerParty : public UObject
@@ -14,15 +14,13 @@ class UPlayerParty : public UObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite)
-	TArray<TObjectPtr<APlayerController>> Players;
-	UPROPERTY(BlueprintReadWrite)
-	TArray<TScriptInterface<IPartyInterface>> Members;
+	UPROPERTY(BlueprintReadOnly)
+	TArray<TObjectPtr<ADRiftPartyCharacter>> Members;
 
 public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetPartySize() const { return Members.Num(); }
-	
+
 };
 
 /**
@@ -47,7 +45,7 @@ public:
 	 * @return True if the character was successfully added, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool AddMemberToParty(const int32 PartyId, AActor* NewMember);
+	bool AddMemberToParty(const int32 PartyId, ADRiftPartyCharacter* NewMember);
 	/**
 	 * Gets the party by its ID.
 	 * @param PartyId The ID of the party to retrieve.
@@ -57,6 +55,7 @@ public:
 	UPlayerParty* GetPlayerPartyById(int32 PartyId);
 	
 private:
+	UPROPERTY()
 	TMap<int32, TObjectPtr<UPlayerParty>> PlayerParties;
 
 	int32 NextPartyId = 0;

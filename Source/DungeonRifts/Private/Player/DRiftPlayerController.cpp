@@ -3,6 +3,16 @@
 #include "Player/DRiftPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Characters/DRiftPartyCharacter.h"
+#include "GameStates/DRiftGameState.h"
+#include "Net/UnrealNetwork.h"
+
+void ADRiftPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADRiftPlayerController, PartyId);
+}
 
 void ADRiftPlayerController::BeginPlay()
 {
@@ -23,6 +33,19 @@ void ADRiftPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADRiftPlayerController::Move);
 }
 
+void ADRiftPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	// TODO:
+	if (ADRiftPartyCharacter* PartyCharacter = Cast<ADRiftPartyCharacter>(InPawn))
+	{
+		ADRiftGameState* GameState = GetWorld()->GetGameState<ADRiftGameState>();
+		PartyId = GameState->CreateParty();
+		GameState->AddMemberToParty(PartyId, PartyCharacter);
+	}
+}
+
 void ADRiftPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	if (APawn* ControlledPawn = GetPawn())
@@ -35,4 +58,9 @@ void ADRiftPlayerController::Move(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardDirection, InputValue.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputValue.X);
 	}
+}
+
+void ADRiftPlayerController::OnRep_PartyId()
+{
+	// TODO: Handle change of party ID
 }
