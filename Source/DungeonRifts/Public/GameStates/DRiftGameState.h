@@ -8,6 +8,8 @@
 
 class ADRiftPartyCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPartyMemberAddedSignature, ADRiftPartyCharacter*, NewMember, const int32, MemberId);
+
 UCLASS(BlueprintType)
 class UPlayerParty : public UObject
 {
@@ -16,12 +18,20 @@ class UPlayerParty : public UObject
 public:
 	UPROPERTY(BlueprintReadOnly)
 	TArray<TObjectPtr<ADRiftPartyCharacter>> Members;
+	UPROPERTY(BlueprintAssignable)
+	FOnPartyMemberAddedSignature OnPartyMemberAddedEvent;
 
 public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetPartySize() const { return Members.Num(); }
+	UFUNCTION(BlueprintCallable)
+	bool AddMember(ADRiftPartyCharacter* NewMember);
+	// UFUNCTION(BlueprintCallable)
+	// ADRiftPartyCharacter* GetMemberAtIndex(int32 Index) const;
 
 };
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnPartyCreatedSignature, const int32 /*PartyId*/, UPlayerParty* /*NewParty*/);
 
 /**
  * 
@@ -30,6 +40,9 @@ UCLASS()
 class DUNGEONRIFTS_API ADRiftGameState : public AGameState
 {
 	GENERATED_BODY()
+
+public:
+	FOnPartyCreatedSignature OnPartyCreatedEvent;
 	
 public:
 	/**
@@ -53,6 +66,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	UPlayerParty* GetPlayerPartyById(int32 PartyId);
+	TMap<int32, TObjectPtr<UPlayerParty>> GetPlayerParties() const { return PlayerParties; }
 	
 private:
 	UPROPERTY()

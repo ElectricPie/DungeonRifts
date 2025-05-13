@@ -40,24 +40,24 @@ void ADRiftPlayerController::OnPossess(APawn* InPawn)
 	// TODO:
 	if (ADRiftPartyCharacter* PartyCharacter = Cast<ADRiftPartyCharacter>(InPawn))
 	{
-		ADRiftGameState* GameState = GetWorld()->GetGameState<ADRiftGameState>();
-		PartyId = GameState->CreateParty();
-		GameState->AddMemberToParty(PartyId, PartyCharacter);
+		// ADRiftGameState* GameState = GetWorld()->GetGameState<ADRiftGameState>();
+		// PartyId = GameState->CreateParty();
+		// GameState->AddMemberToParty(PartyId, PartyCharacter);
 	}
 }
 
 void ADRiftPlayerController::Move(const FInputActionValue& InputActionValue)
 {
-	if (APawn* ControlledPawn = GetPawn())
-	{
-		const FVector2D InputValue = InputActionValue.Get<FVector2D>();
-		const FRotator YawRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetScaledAxis(EAxis::X);
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetScaledAxis(EAxis::Y);
-
-		ControlledPawn->AddMovementInput(ForwardDirection, InputValue.Y);
-		ControlledPawn->AddMovementInput(RightDirection, InputValue.X);
-	}
+	// if (APawn* ControlledPawn = GetPawn())
+	// {
+	// 	const FVector2D InputValue = InputActionValue.Get<FVector2D>();
+	// 	const FRotator YawRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
+	// 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetScaledAxis(EAxis::X);
+	// 	const FVector RightDirection = FRotationMatrix(YawRotation).GetScaledAxis(EAxis::Y);
+	//
+	// 	ControlledPawn->AddMovementInput(ForwardDirection, InputValue.Y);
+	// 	ControlledPawn->AddMovementInput(RightDirection, InputValue.X);
+	// }
 }
 
 void ADRiftPlayerController::OnRep_PartyId()

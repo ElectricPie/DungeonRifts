@@ -6,6 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "DRiftHUD.generated.h"
 
+struct FWidgetControllerParams;
+class UPartyFrameWidgetController;
 class UDRiftUserWidget;
 
 /**
@@ -16,11 +18,20 @@ class DUNGEONRIFTS_API ADRiftHUD : public AHUD
 {
 	GENERATED_BODY()
 
+public:
+	UPartyFrameWidgetController* GetPartyFrameWidgetController(const FWidgetControllerParams& ControllerParams);
+
 protected:
 	virtual void BeginPlay() override;
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDRiftUserWidget> OverlayWidgetClass;
+	UPROPERTY()
 	TObjectPtr<UDRiftUserWidget> OverlayWidget;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UPartyFrameWidgetController> PartyFrameWidgetControllerClass;
+	UPROPERTY()
+	TObjectPtr<UPartyFrameWidgetController> PartyFrameWidgetController;
 };
