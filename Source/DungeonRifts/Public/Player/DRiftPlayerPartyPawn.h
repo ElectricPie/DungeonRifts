@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "DRiftPlayerPartyPawn.generated.h"
 
+class ADRiftPartyCharacter;
+
 UCLASS()
 class DUNGEONRIFTS_API ADRiftPlayerPartyPawn : public APawn
 {
@@ -14,4 +16,13 @@ class DUNGEONRIFTS_API ADRiftPlayerPartyPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	ADRiftPlayerPartyPawn();
+
+	virtual void Tick(float DeltaSeconds) override;
+
+public:
+	void SetPartyMember(ADRiftPartyCharacter* InMember);
+
+private:
+	UPROPERTY()
+	TObjectPtr<ADRiftPartyCharacter> ControlledPartyMember;
 };

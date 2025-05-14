@@ -4,6 +4,7 @@
 #include "UI/WidgetControllers/PartyFrameWidgetController.h"
 
 #include "GameStates/DRiftGameState.h"
+#include "Player/DRiftPlayerController.h"
 
 void UPartyFrameWidgetController::BindCallbacksToDependencies()
 {	
@@ -24,5 +25,13 @@ void UPartyFrameWidgetController::BroadcastInitialValues()
 		{
 			PartyCreatedEvent.Broadcast(Parties.Key, Parties.Value);
 		}
+	}
+}
+
+void UPartyFrameWidgetController::SetPlayerCharacter(ADRiftPartyCharacter* InCharacter) const
+{
+	if (ADRiftPlayerController* DRiftPlayerController = Cast<ADRiftPlayerController>(PlayerController))
+	{
+		DRiftPlayerController->SetTargetPartyCharacter(InCharacter);
 	}
 }

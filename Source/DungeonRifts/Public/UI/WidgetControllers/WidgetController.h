@@ -36,7 +36,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues() {}
 
-private:
+protected:
 	UPROPERTY()
 	TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY()

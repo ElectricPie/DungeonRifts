@@ -7,6 +7,8 @@
 #include "Party/PartyInterface.h"
 #include "DRiftPlayerController.generated.h"
 
+class ADRiftPartyCharacter;
+class ADRiftPlayerPartyPawn;
 struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
@@ -25,6 +27,8 @@ public:
 	virtual void SetPartyId_Implementation(const int32 NewPartyId) override { PartyId = NewPartyId; }
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void SetTargetPartyCharacter(ADRiftPartyCharacter* InCharacter) const;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -39,6 +43,9 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_PartyId)
 	int32 PartyId = -1;
+
+	UPROPERTY()
+	TObjectPtr<ADRiftPartyCharacter> TargetPartyCharacter;
 
 private:
 	void Move(const FInputActionValue& InputActionValue);

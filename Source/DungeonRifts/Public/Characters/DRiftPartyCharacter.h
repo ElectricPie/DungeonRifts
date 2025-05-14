@@ -23,7 +23,11 @@ public:
 	virtual int32 GetPartyId_Implementation() const override { return PartyId; }
 	virtual void SetPartyId_Implementation(const int32 NewPartyId) override { PartyId = NewPartyId; }
 	/* End Party Interface */
-	
+
+	UFUNCTION(BlueprintPure)
+	const FString& GetCharacterName() const { return CharacterName; }
+	UFUNCTION(BlueprintCallable)
+	void SetCharacterName(const FString& NewName) { CharacterName = NewName; }
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -32,4 +36,6 @@ private:
 	TObjectPtr<UCameraComponent> CameraComponent;
 
 	int32 PartyId = -1;
+
+	FString CharacterName = TEXT("Party Member");
 };

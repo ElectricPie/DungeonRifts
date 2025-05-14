@@ -26,4 +26,7 @@ public:
 public:
 	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerCharacter(ADRiftPartyCharacter* InCharacter) const;
 };

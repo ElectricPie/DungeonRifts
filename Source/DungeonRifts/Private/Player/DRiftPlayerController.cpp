@@ -1,17 +1,25 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Player/DRiftPlayerController.h"
-#include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "Characters/DRiftPartyCharacter.h"
-#include "GameStates/DRiftGameState.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/DRiftPlayerPartyPawn.h"
 
 void ADRiftPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADRiftPlayerController, PartyId);
+}
+
+void ADRiftPlayerController::SetTargetPartyCharacter(ADRiftPartyCharacter* InCharacter) const
+{
+	if (ADRiftPlayerPartyPawn* PlayerPartyPawn = Cast<ADRiftPlayerPartyPawn>(GetPawn()))
+	{
+		PlayerPartyPawn->SetPartyMember(InCharacter);
+	}
 }
 
 void ADRiftPlayerController::BeginPlay()
