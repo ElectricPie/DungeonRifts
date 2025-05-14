@@ -7,9 +7,6 @@
 #include "Party/PartyInterface.h"
 #include "DRiftPartyCharacter.generated.h"
 
-class USpringArmComponent;
-class UCameraComponent;
-
 UCLASS()
 class DUNGEONRIFTS_API ADRiftPartyCharacter : public ADRiftCharacterBase, public IPartyInterface
 {
@@ -30,11 +27,6 @@ public:
 	void SetCharacterName(const FString& NewName) { CharacterName = NewName; }
 
 private:
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USpringArmComponent> CameraSpringArmComponent;
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UCameraComponent> CameraComponent;
-
 	int32 PartyId = -1;
 
 	FString CharacterName = TEXT("Party Member");

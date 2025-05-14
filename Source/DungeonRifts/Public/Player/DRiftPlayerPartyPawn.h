@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "DRiftPlayerPartyPawn.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
 class ADRiftPartyCharacter;
 
 UCLASS()
@@ -23,6 +25,11 @@ public:
 	void SetPartyMember(ADRiftPartyCharacter* InMember);
 
 private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USpringArmComponent> CameraSpringArmComponent;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UCameraComponent> CameraComponent;
+	
 	UPROPERTY()
 	TObjectPtr<ADRiftPartyCharacter> ControlledPartyMember;
 };
