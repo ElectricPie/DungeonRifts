@@ -1,8 +1,11 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Player/DRiftPlayerController.h"
+
+#include "AIController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Characters/DRiftPartyCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/DRiftPlayerPartyPawn.h"
@@ -14,8 +17,27 @@ void ADRiftPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME(ADRiftPlayerController, PartyId);
 }
 
-void ADRiftPlayerController::SetTargetPartyCharacter(ADRiftPartyCharacter* InCharacter) const
+void ADRiftPlayerController::SetTargetPartyCharacter(ADRiftPartyCharacter* InCharacter)
 {
+	if (InCharacter == nullptr)
+		return;
+	
+	PartyCharacter = InCharacter;
+	PartyCharacterController = Cast<AAIController>(PartyCharacter->GetController());
+	// TODO: Debug
+	if (PartyCharacterController)
+	{
+		if (UBlackboardComponent* CharacterBlackboard = PartyCharacterController->GetBlackboardComponent())
+		{
+			const FVector TargetLocation(
+				FMath::RandRange(-1000.f, 1000.f),
+				FMath::RandRange(-1000.f, 1000.f),
+				PartyCharacter->GetActorLocation().Z
+			);
+			CharacterBlackboard->SetValueAsVector(TEXT("WorldDestination"), TargetLocation);
+		}
+	}
+	
 	if (ADRiftPlayerPartyPawn* PlayerPartyPawn = Cast<ADRiftPlayerPartyPawn>(GetPawn()))
 	{
 		PlayerPartyPawn->SetPartyMember(InCharacter);
@@ -45,13 +67,12 @@ void ADRiftPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	// TODO:
-	if (ADRiftPartyCharacter* PartyCharacter = Cast<ADRiftPartyCharacter>(InPawn))
-	{
-		// ADRiftGameState* GameState = GetWorld()->GetGameState<ADRiftGameState>();
-		// PartyId = GameState->CreateParty();
-		// GameState->AddMemberToParty(PartyId, PartyCharacter);
-	}
+	// if (ADRiftPartyCharacter* PartyCharacter = Cast<ADRiftPartyCharacter>(InPawn))
+	// {
+	// 	ADRiftGameState* GameState = GetWorld()->GetGameState<ADRiftGameState>();
+	// 	PartyId = GameState->CreateParty();
+	// 	GameState->AddMemberToParty(PartyId, PartyCharacter);
+	// }
 }
 
 void ADRiftPlayerController::Move(const FInputActionValue& InputActionValue)
