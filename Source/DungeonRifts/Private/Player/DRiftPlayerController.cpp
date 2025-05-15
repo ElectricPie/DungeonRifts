@@ -2,11 +2,11 @@
 
 #include "Player/DRiftPlayerController.h"
 
-#include "AIController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Characters/DRiftPartyCharacter.h"
 #include "Controller/PartyCharacterController.h"
+#include "GameStates/DRiftGameState.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/DRiftPlayerPartyPawn.h"
 
@@ -82,8 +82,15 @@ void ADRiftPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void ADRiftPlayerController::Select()
 {
-	if (PartyCharacterController == nullptr)
+	// if (PartyCharacterController == nullptr)
+	// 	return;
+
+	if (PlayerParty == nullptr)
+	{
+		ADRiftGameState* GameState = GetWorld()->GetGameState<ADRiftGameState>();
+		PlayerParty = GameState->GetPlayerPartyById(0);
 		return;
+	}
 
 	FVector2D MouseScreenPosition;
 	if (GetMousePosition(MouseScreenPosition.X, MouseScreenPosition.Y))
@@ -101,7 +108,14 @@ void ADRiftPlayerController::Select()
 
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, MouseWorldPosition, End, ECC_Visibility, CollisionParams))
 		{
-			PartyCharacterController->SetWorldDestination(HitResult.Location);
+			// PartyCharacterController->SetWorldDestination(HitResult.Location);
+			for (const auto& PartyMember : PlayerParty->GetPartyMembers())
+			{
+				if (APartyCharacterController* MemberController = PartyMember->GetController<APartyCharacterController>())
+				{
+					MemberController->SetWorldDestination(HitResult.Location);
+				}
+			}
 		}
 	}
 }

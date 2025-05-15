@@ -7,6 +7,7 @@
 #include "Party/PartyInterface.h"
 #include "DRiftPlayerController.generated.h"
 
+class UPlayerParty;
 class ADRiftPartyCharacter;
 class ADRiftPlayerPartyPawn;
 class APartyCharacterController;
@@ -61,4 +62,7 @@ private:
 	
 	UFUNCTION()
 	void OnRep_PartyId();
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPlayerParty> PlayerParty = nullptr;
 };

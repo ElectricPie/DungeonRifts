@@ -7,6 +7,8 @@
 #include "Party/PartyInterface.h"
 #include "DRiftPartyCharacter.generated.h"
 
+class UPlayerParty;
+
 UCLASS()
 class DUNGEONRIFTS_API ADRiftPartyCharacter : public ADRiftCharacterBase, public IPartyInterface
 {

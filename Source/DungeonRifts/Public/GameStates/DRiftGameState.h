@@ -16,8 +16,6 @@ class UPlayerParty : public UObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly)
-	TArray<TObjectPtr<ADRiftPartyCharacter>> Members;
 	UPROPERTY(BlueprintAssignable)
 	FOnPartyMemberAddedSignature OnPartyMemberAddedEvent;
 
@@ -29,6 +27,13 @@ public:
 	// UFUNCTION(BlueprintCallable)
 	// ADRiftPartyCharacter* GetMemberAtIndex(int32 Index) const;
 
+	UFUNCTION(BlueprintCallable)
+	TArray<ADRiftPartyCharacter*> GetPartyMembers() const { return Members; }
+
+private:
+	UPROPERTY()
+	TArray<TObjectPtr<ADRiftPartyCharacter>> Members;
+	
 };
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnPartyCreatedSignature, const int32 /*PartyId*/, UPlayerParty* /*NewParty*/);
