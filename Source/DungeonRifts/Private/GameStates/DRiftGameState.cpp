@@ -4,16 +4,7 @@
 #include "GameStates/DRiftGameState.h"
 
 #include "Characters/DRiftPartyCharacter.h"
-
-bool UPlayerParty::AddMember(ADRiftPartyCharacter* NewMember)
-{
-	if (NewMember == nullptr)
-		return false;
-	
-	const int32 MemberId = Members.Add(NewMember);
-	OnPartyMemberAddedEvent.Broadcast(NewMember, MemberId);
-	return true;
-}
+#include "Party/PlayerParty.h"
 
 int32 ADRiftGameState::CreateParty()
 {

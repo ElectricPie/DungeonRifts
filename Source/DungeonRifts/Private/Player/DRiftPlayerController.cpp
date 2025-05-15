@@ -8,6 +8,7 @@
 #include "Controller/PartyCharacterController.h"
 #include "GameStates/DRiftGameState.h"
 #include "Net/UnrealNetwork.h"
+#include "Party/PlayerParty.h"
 #include "Player/DRiftPlayerPartyPawn.h"
 
 void ADRiftPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -89,7 +90,8 @@ void ADRiftPlayerController::Select()
 	{
 		ADRiftGameState* GameState = GetWorld()->GetGameState<ADRiftGameState>();
 		PlayerParty = GameState->GetPlayerPartyById(0);
-		return;
+		if (PlayerParty == nullptr)
+			return;
 	}
 
 	FVector2D MouseScreenPosition;
