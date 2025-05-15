@@ -28,8 +28,12 @@ void UPartyFrameWidgetController::BroadcastInitialValues()
 	}
 }
 
-void UPartyFrameWidgetController::SetPlayerCharacter(ADRiftPartyCharacter* InCharacter) const
+void UPartyFrameWidgetController::SelectPartyCharacter(ADRiftPartyCharacter* InCharacter) const
 {
+	TArray<ADRiftPartyCharacter*> SelectedCharacters;
+	SelectedCharacters.Add(InCharacter);
+	CharactersSelectedEvent.Broadcast(SelectedCharacters);
+	
 	if (ADRiftPlayerController* DRiftPlayerController = Cast<ADRiftPlayerController>(PlayerController))
 	{
 		DRiftPlayerController->SetTargetPartyCharacter(InCharacter);

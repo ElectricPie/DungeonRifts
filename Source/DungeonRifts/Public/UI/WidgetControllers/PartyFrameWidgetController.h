@@ -10,6 +10,7 @@ class UPlayerParty;
 class ADRiftPartyCharacter;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWidgetPartyCreatedSignature, const int32, PartyId, UPlayerParty*, NewParty);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharactersSelectedSignature, const TArray<ADRiftPartyCharacter*>&, SelectedCharacter);
 
 /**
  * 
@@ -22,11 +23,13 @@ class DUNGEONRIFTS_API UPartyFrameWidgetController : public UWidgetController
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnWidgetPartyCreatedSignature PartyCreatedEvent;
+	UPROPERTY(BlueprintAssignable)
+	FOnCharactersSelectedSignature CharactersSelectedEvent;
 	
 public:
 	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetPlayerCharacter(ADRiftPartyCharacter* InCharacter) const;
+	void SelectPartyCharacter(ADRiftPartyCharacter* InCharacter) const;
 };
