@@ -7,10 +7,9 @@
 #include "Party/PartyInterface.h"
 #include "DRiftPlayerController.generated.h"
 
-class AAIController;
-class ADRiftPartyCharacterController;
 class ADRiftPartyCharacter;
 class ADRiftPlayerPartyPawn;
+class APartyCharacterController;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
@@ -42,6 +41,8 @@ private:
 	TObjectPtr<UInputMappingContext> MappingContext;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> MoveAction;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> SelectAction;
 	
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_PartyId)
 	int32 PartyId = -1;
@@ -49,11 +50,15 @@ private:
 	UPROPERTY()
 	TObjectPtr<ADRiftPartyCharacter> PartyCharacter;
 	UPROPERTY()
-	TObjectPtr<AAIController> PartyCharacterController;
+	TObjectPtr<APartyCharacterController> PartyCharacterController;
+
+	UPROPERTY(EditAnywhere)
+	float SelectRayLength = 10000.f;
 	
 private:
 	void Move(const FInputActionValue& InputActionValue);
-
+	void Select();
+	
 	UFUNCTION()
 	void OnRep_PartyId();
 };

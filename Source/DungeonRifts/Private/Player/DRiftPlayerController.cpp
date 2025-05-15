@@ -5,8 +5,8 @@
 #include "AIController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "Characters/DRiftPartyCharacter.h"
+#include "Controller/PartyCharacterController.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/DRiftPlayerPartyPawn.h"
 
@@ -21,23 +21,10 @@ void ADRiftPlayerController::SetTargetPartyCharacter(ADRiftPartyCharacter* InCha
 {
 	if (InCharacter == nullptr)
 		return;
-	
+
 	PartyCharacter = InCharacter;
-	PartyCharacterController = Cast<AAIController>(PartyCharacter->GetController());
-	// TODO: Debug
-	if (PartyCharacterController)
-	{
-		if (UBlackboardComponent* CharacterBlackboard = PartyCharacterController->GetBlackboardComponent())
-		{
-			const FVector TargetLocation(
-				FMath::RandRange(-1000.f, 1000.f),
-				FMath::RandRange(-1000.f, 1000.f),
-				PartyCharacter->GetActorLocation().Z
-			);
-			CharacterBlackboard->SetValueAsVector(TEXT("WorldDestination"), TargetLocation);
-		}
-	}
-	
+	PartyCharacterController = Cast<APartyCharacterController>(PartyCharacter->GetController());
+
 	if (ADRiftPlayerPartyPawn* PlayerPartyPawn = Cast<ADRiftPlayerPartyPawn>(GetPawn()))
 	{
 		PlayerPartyPawn->SetPartyMember(InCharacter);
@@ -47,12 +34,15 @@ void ADRiftPlayerController::SetTargetPartyCharacter(ADRiftPartyCharacter* InCha
 void ADRiftPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	check(MappingContext);
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(MappingContext, 0);
 	}
+
+	bShowMouseCursor = true;
 }
 
 void ADRiftPlayerController::SetupInputComponent()
@@ -61,6 +51,7 @@ void ADRiftPlayerController::SetupInputComponent()
 
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADRiftPlayerController::Move);
+	EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Started, this, &ADRiftPlayerController::Select);
 }
 
 void ADRiftPlayerController::OnPossess(APawn* InPawn)
@@ -87,6 +78,32 @@ void ADRiftPlayerController::Move(const FInputActionValue& InputActionValue)
 	// 	ControlledPawn->AddMovementInput(ForwardDirection, InputValue.Y);
 	// 	ControlledPawn->AddMovementInput(RightDirection, InputValue.X);
 	// }
+}
+
+void ADRiftPlayerController::Select()
+{
+	if (PartyCharacterController == nullptr)
+		return;
+
+	FVector2D MouseScreenPosition;
+	if (GetMousePosition(MouseScreenPosition.X, MouseScreenPosition.Y))
+	{
+		FVector MouseWorldPosition;
+		FVector MouseWorldDirection;
+		DeprojectScreenPositionToWorld(MouseScreenPosition.X, MouseScreenPosition.Y, MouseWorldPosition,
+		                               MouseWorldDirection);
+
+		FHitResult HitResult;
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this);
+
+		const FVector End = MouseWorldPosition + MouseWorldDirection * SelectRayLength;
+
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, MouseWorldPosition, End, ECC_Visibility, CollisionParams))
+		{
+			PartyCharacterController->SetWorldDestination(HitResult.Location);
+		}
+	}
 }
 
 void ADRiftPlayerController::OnRep_PartyId()

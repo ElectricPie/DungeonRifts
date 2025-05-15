@@ -17,6 +17,8 @@ public:
 	// Sets default values for this actor's properties
 	APartyCharacterController();
 
+	void SetWorldDestination(const FVector& Destination);
+
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 

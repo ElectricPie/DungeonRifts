@@ -16,6 +16,16 @@ APartyCharacterController::APartyCharacterController()
 	Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
 }
 
+void APartyCharacterController::SetWorldDestination(const FVector& Destination)
+{
+	DrawDebugSphere(GetWorld(), Destination, 20.f, 12, FColor::Red, false, 5.f);
+
+	if (UBlackboardComponent* CharacterBlackboard = GetBlackboardComponent())
+	{
+		CharacterBlackboard->SetValueAsVector(TEXT("WorldDestination"), Destination);
+	}
+}
+
 void APartyCharacterController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
