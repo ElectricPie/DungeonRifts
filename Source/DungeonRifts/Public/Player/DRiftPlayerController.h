@@ -7,6 +7,8 @@
 #include "Party/PartyInterface.h"
 #include "DRiftPlayerController.generated.h"
 
+
+
 class UPlayerParty;
 class ADRiftPartyCharacter;
 class ADRiftPlayerPartyPawn;
@@ -14,6 +16,8 @@ class APartyCharacterController;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerCharactersSelectedSignature, const TArray<ADRiftPartyCharacter*>&/*SelectedCharacter*/);
 
 /**
  * 
@@ -24,13 +28,28 @@ class DUNGEONRIFTS_API ADRiftPlayerController : public APlayerController, public
 	GENERATED_BODY()
 
 public:
+	FOnPlayerCharactersSelectedSignature OnPlayerCharactersSelectedEvent;
+
+public:
 	/* Party Interface */
 	virtual int32 GetPartyId_Implementation() const override { return PartyId; }
 	virtual void SetPartyId_Implementation(const int32 NewPartyId) override { PartyId = NewPartyId; }
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	void SetTargetPartyCharacter(ADRiftPartyCharacter* InCharacter);
+	/**
+	 * Set the selected party character as the only selected character.
+	 * @param InCharacter The party character to set as selected.
+	 */
+	void SetSelectedPartyCharacter(ADRiftPartyCharacter* InCharacter);
+	/**
+	 * Add a party character to the selection.
+	 * @param InCharacter The party character to add to the selection.
+	 */
+	void AddPartyCharacter(ADRiftPartyCharacter* InCharacter);
+
+	UFUNCTION(BlueprintPure)
+	bool IsSelectModifierPressed() const { return bSelectModifierPressed; }
 	
 protected:
 	virtual void BeginPlay() override;
@@ -44,17 +63,27 @@ private:
 	TObjectPtr<UInputAction> MoveAction;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> SelectAction;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> SelectModifierAction;
 	
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing=OnRep_PartyId)
 	int32 PartyId = -1;
 
-	UPROPERTY()
-	TObjectPtr<ADRiftPartyCharacter> PartyCharacter;
-	UPROPERTY()
-	TObjectPtr<APartyCharacterController> PartyCharacterController;
+	// UPROPERTY()
+	// TObjectPtr<ADRiftPartyCharacter> PartyCharacter;
+	// UPROPERTY()
+	// TObjectPtr<APartyCharacterController> PartyCharacterController;
 
 	UPROPERTY(EditAnywhere)
 	float SelectRayLength = 10000.f;
+
+	bool bSelectModifierPressed = false;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPlayerParty> PlayerParty = nullptr;
+
+	UPROPERTY()
+	TArray<TObjectPtr<ADRiftPartyCharacter>> SelectedPartyCharacters;
 	
 private:
 	void Move(const FInputActionValue& InputActionValue);
@@ -62,7 +91,7 @@ private:
 	
 	UFUNCTION()
 	void OnRep_PartyId();
-	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UPlayerParty> PlayerParty = nullptr;
+
+	void SelectModifierPressed() { bSelectModifierPressed = true; }
+	void SelectModifierReleased() { bSelectModifierPressed = false; }
 };

@@ -15,6 +15,14 @@ void UPartyFrameWidgetController::BindCallbacksToDependencies()
 			PartyCreatedEvent.Broadcast(NewPartyId, NewParty);
 		});
 	}
+
+	if (ADRiftPlayerController* DRiftPlayerController = Cast<ADRiftPlayerController>(PlayerController))
+	{
+		DRiftPlayerController->OnPlayerCharactersSelectedEvent.AddLambda([this](const TArray<ADRiftPartyCharacter*>& SelectedCharacters)
+		{
+			CharactersSelectedEvent.Broadcast(SelectedCharacters);
+		});
+	}
 }
 
 void UPartyFrameWidgetController::BroadcastInitialValues()
@@ -32,10 +40,17 @@ void UPartyFrameWidgetController::SelectPartyCharacter(ADRiftPartyCharacter* InC
 {
 	TArray<ADRiftPartyCharacter*> SelectedCharacters;
 	SelectedCharacters.Add(InCharacter);
-	CharactersSelectedEvent.Broadcast(SelectedCharacters);
+	// CharactersSelectedEvent.Broadcast(SelectedCharacters);
 	
 	if (ADRiftPlayerController* DRiftPlayerController = Cast<ADRiftPlayerController>(PlayerController))
 	{
-		DRiftPlayerController->SetTargetPartyCharacter(InCharacter);
+		if (DRiftPlayerController->IsSelectModifierPressed())
+		{
+			DRiftPlayerController->AddPartyCharacter(InCharacter);
+		}
+		else
+		{
+			DRiftPlayerController->SetSelectedPartyCharacter(InCharacter);
+		}
 	}
 }

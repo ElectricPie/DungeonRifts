@@ -8,7 +8,6 @@
 #include "Controller/PartyCharacterController.h"
 #include "GameStates/DRiftGameState.h"
 #include "Net/UnrealNetwork.h"
-#include "Party/PlayerParty.h"
 #include "Player/DRiftPlayerPartyPawn.h"
 
 void ADRiftPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -18,18 +17,28 @@ void ADRiftPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME(ADRiftPlayerController, PartyId);
 }
 
-void ADRiftPlayerController::SetTargetPartyCharacter(ADRiftPartyCharacter* InCharacter)
+void ADRiftPlayerController::SetSelectedPartyCharacter(ADRiftPartyCharacter* InCharacter)
 {
 	if (InCharacter == nullptr)
 		return;
 
-	PartyCharacter = InCharacter;
-	PartyCharacterController = Cast<APartyCharacterController>(PartyCharacter->GetController());
+	SelectedPartyCharacters.Empty();
+	SelectedPartyCharacters.Add(InCharacter);
 
 	if (ADRiftPlayerPartyPawn* PlayerPartyPawn = Cast<ADRiftPlayerPartyPawn>(GetPawn()))
 	{
 		PlayerPartyPawn->SetPartyMember(InCharacter);
 	}
+	OnPlayerCharactersSelectedEvent.Broadcast(SelectedPartyCharacters);
+}
+
+void ADRiftPlayerController::AddPartyCharacter(ADRiftPartyCharacter* InCharacter)
+{
+	if (InCharacter == nullptr)
+		return;
+	
+	SelectedPartyCharacters.AddUnique(InCharacter);
+	OnPlayerCharactersSelectedEvent.Broadcast(SelectedPartyCharacters);
 }
 
 void ADRiftPlayerController::BeginPlay()
@@ -53,6 +62,8 @@ void ADRiftPlayerController::SetupInputComponent()
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADRiftPlayerController::Move);
 	EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Started, this, &ADRiftPlayerController::Select);
+	EnhancedInputComponent->BindAction(SelectModifierAction, ETriggerEvent::Started, this, &ADRiftPlayerController::SelectModifierPressed);
+	EnhancedInputComponent->BindAction(SelectModifierAction, ETriggerEvent::Completed, this, &ADRiftPlayerController::SelectModifierReleased);
 }
 
 void ADRiftPlayerController::OnPossess(APawn* InPawn)
@@ -83,17 +94,9 @@ void ADRiftPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void ADRiftPlayerController::Select()
 {
-	// if (PartyCharacterController == nullptr)
-	// 	return;
-
-	if (PlayerParty == nullptr)
-	{
-		ADRiftGameState* GameState = GetWorld()->GetGameState<ADRiftGameState>();
-		PlayerParty = GameState->GetPlayerPartyById(0);
-		if (PlayerParty == nullptr)
-			return;
-	}
-
+	if (SelectedPartyCharacters.Num() == 0)
+		return;
+	
 	FVector2D MouseScreenPosition;
 	if (GetMousePosition(MouseScreenPosition.X, MouseScreenPosition.Y))
 	{
@@ -110,12 +113,11 @@ void ADRiftPlayerController::Select()
 
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, MouseWorldPosition, End, ECC_Visibility, CollisionParams))
 		{
-			// PartyCharacterController->SetWorldDestination(HitResult.Location);
-			for (const auto& PartyMember : PlayerParty->GetPartyMembers())
+			for (const auto& SelectedCharacter : SelectedPartyCharacters)
 			{
-				if (APartyCharacterController* MemberController = PartyMember->GetController<APartyCharacterController>())
+				if (APartyCharacterController* PartyCharacterController = Cast<APartyCharacterController>(SelectedCharacter->GetController()))
 				{
-					MemberController->SetWorldDestination(HitResult.Location);
+					PartyCharacterController->SetWorldDestination(HitResult.Location);
 				}
 			}
 		}
