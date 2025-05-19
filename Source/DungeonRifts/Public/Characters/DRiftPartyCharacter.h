@@ -25,8 +25,15 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	const FString& GetCharacterName() const { return CharacterName; }
+
 	UFUNCTION(BlueprintCallable)
 	void SetCharacterName(const FString& NewName) { CharacterName = NewName; }
+
+protected:
+	virtual void BeginPlay() override;
+
+	virtual void InitAbilityActorInfo() override;
+	virtual void InitDefaultAttributes() const override;
 
 private:
 	int32 PartyId = -1;

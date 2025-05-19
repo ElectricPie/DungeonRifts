@@ -12,3 +12,12 @@ ADRiftCharacterBase::ADRiftCharacterBase()
 	
 }
 
+void ADRiftCharacterBase::InitAbilityActorInfo()
+{
+}
+
+void ADRiftCharacterBase::InitDefaultAttributes() const
+{
+}
+
+
