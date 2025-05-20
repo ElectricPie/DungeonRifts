@@ -23,13 +23,15 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UAttributeSet> AttributeSet;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes|Defaults")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes|Defaults")
+	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 
 protected:
 	virtual void InitAbilityActorInfo();

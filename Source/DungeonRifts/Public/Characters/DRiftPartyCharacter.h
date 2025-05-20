@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DRiftCharacterBase.h"
+#include "AbilitySystem/DRiftAttributeSet.h"
 #include "Party/PartyInterface.h"
 #include "DRiftPartyCharacter.generated.h"
 
@@ -14,6 +15,12 @@ class DUNGEONRIFTS_API ADRiftPartyCharacter : public ADRiftCharacterBase, public
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnAttirbuteChangedSignature OnHealthChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnAttirbuteChangedSignature OnMaxHealthChanged;
+	
 public:
 	// Sets default values for this character's properties
 	ADRiftPartyCharacter();
@@ -28,6 +35,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCharacterName(const FString& NewName) { CharacterName = NewName; }
+	
+	UFUNCTION(BlueprintCallable)
+	void BroadcastAttributes() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,4 +49,7 @@ private:
 	int32 PartyId = -1;
 
 	FString CharacterName = TEXT("Party Member");
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> DamageTestEffect;
 };

@@ -21,11 +21,47 @@ ADRiftPartyCharacter::ADRiftPartyCharacter()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
+void ADRiftPartyCharacter::BroadcastAttributes() const
+{
+	if (const UDRiftAttributeSet* DRiftAttributeSet = CastChecked<UDRiftAttributeSet>(AttributeSet))
+	{
+		OnHealthChanged.Broadcast(DRiftAttributeSet->GetHealth());
+		OnMaxHealthChanged.Broadcast(DRiftAttributeSet->GetMaxHealth());
+	}
+}
+
 void ADRiftPartyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	InitAbilityActorInfo();
+
+	if (const UDRiftAttributeSet* DRiftAttributeSet = CastChecked<UDRiftAttributeSet>(AttributeSet))
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DRiftAttributeSet->GetHealthAttribute()).
+			AddLambda([this](const FOnAttributeChangeData& Data)
+			{
+				if (GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Health: %f"), Data.NewValue));
+				}
+				OnHealthChanged.Broadcast(Data.NewValue);
+			});
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DRiftAttributeSet->GetMaxHealthAttribute()).
+			AddLambda([this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChanged.Broadcast(Data.NewValue);
+			});
+
+		OnHealthChanged.Broadcast(DRiftAttributeSet->GetHealth());
+		OnMaxHealthChanged.Broadcast(DRiftAttributeSet->GetMaxHealth());
+	}
+
+	// TODO: Debug
+	FGameplayEffectContextHandle DamageEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
+	DamageEffectContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle TestDamageEffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DamageTestEffect, 1.f, DamageEffectContextHandle);
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*TestDamageEffectSpecHandle.Data.Get());
 }
 
 void ADRiftPartyCharacter::InitAbilityActorInfo()
@@ -38,11 +74,16 @@ void ADRiftPartyCharacter::InitAbilityActorInfo()
 void ADRiftPartyCharacter::InitDefaultAttributes() const
 {
 	// TODO: Move out of here possibly into system library
+	// Secondary Attributes
+	FGameplayEffectContextHandle SecondaryEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
+	SecondaryEffectContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle SecondaryAttributeSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultSecondaryAttributes, 1.f, SecondaryEffectContextHandle);
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SecondaryAttributeSpecHandle.Data.Get());
+	
 	// Vital Attributes
 	FGameplayEffectContextHandle VitalEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
 	VitalEffectContextHandle.AddSourceObject(this);
 	const FGameplayEffectSpecHandle VitalAttributeSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultVitalAttributes, 1.f, VitalEffectContextHandle);
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*VitalAttributeSpecHandle.Data.Get());
-	UE_LOG(LogTemp, Warning, TEXT("Applying Default Vital Attributes to %s"), *GetName());
 }
 
