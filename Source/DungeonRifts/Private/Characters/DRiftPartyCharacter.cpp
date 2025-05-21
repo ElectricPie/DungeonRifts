@@ -4,6 +4,7 @@
 #include "Characters/DRiftPartyCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/DRiftAbilitySystemLibrary.h"
 #include "AbilitySystem/DRiftAttributeSet.h"
 
 // Sets default values
@@ -41,10 +42,6 @@ void ADRiftPartyCharacter::BeginPlay()
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DRiftAttributeSet->GetHealthAttribute()).
 			AddLambda([this](const FOnAttributeChangeData& Data)
 			{
-				if (GEngine)
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Health: %f"), Data.NewValue));
-				}
 				OnHealthChanged.Broadcast(Data.NewValue);
 			});
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(DRiftAttributeSet->GetMaxHealthAttribute()).
@@ -73,17 +70,6 @@ void ADRiftPartyCharacter::InitAbilityActorInfo()
 
 void ADRiftPartyCharacter::InitDefaultAttributes() const
 {
-	// TODO: Move out of here possibly into system library
-	// Secondary Attributes
-	FGameplayEffectContextHandle SecondaryEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
-	SecondaryEffectContextHandle.AddSourceObject(this);
-	const FGameplayEffectSpecHandle SecondaryAttributeSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultSecondaryAttributes, 1.f, SecondaryEffectContextHandle);
-	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SecondaryAttributeSpecHandle.Data.Get());
-	
-	// Vital Attributes
-	FGameplayEffectContextHandle VitalEffectContextHandle = AbilitySystemComponent->MakeEffectContext();
-	VitalEffectContextHandle.AddSourceObject(this);
-	const FGameplayEffectSpecHandle VitalAttributeSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultVitalAttributes, 1.f, VitalEffectContextHandle);
-	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*VitalAttributeSpecHandle.Data.Get());
+	UDRiftAbilitySystemLibrary::InitializeDefaultAttributes(this, AbilitySystemComponent, 1.f, CharacterInfo);
 }
 

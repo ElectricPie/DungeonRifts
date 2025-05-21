@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "DRiftCharacterBase.generated.h"
 
+class UCharacterInfo;
 class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
@@ -28,11 +29,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UAttributeSet> AttributeSet;
 
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes|Defaults")
+	// TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes|Defaults")
+	// TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes|Defaults")
-	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Attributes|Defaults")
-	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
-
+	TObjectPtr<UCharacterInfo> CharacterInfo;
+	
 protected:
 	virtual void InitAbilityActorInfo();
 	virtual void InitDefaultAttributes() const;
